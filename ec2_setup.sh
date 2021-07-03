@@ -39,12 +39,13 @@ docker run \
 	--rm \
 	-d \
 	docker.elastic.co/kibana/kibana:7.12.1;
+echp "[!] Waiting for Kibana to start, sleeping 20s"
+sleep 30;
 
 falco -c ./falco_custom.yaml \
         -r /etc/falco/falco_rules.yaml \
         -r /etc/falco/falco_rules.local.yaml \
         -r /etc/falco/k8s_audit_rules.yaml &
-
 echo "[!] Waiting for Falco to start, sleeping 5s"
 sleep 5;
 
