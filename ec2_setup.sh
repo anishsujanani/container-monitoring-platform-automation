@@ -48,13 +48,14 @@ falco -c ./falco_custom.yaml \
 echo "[!] Waiting for Falco to start, sleeping 5s"
 sleep 5;
 
+curl -X POST \
+        -d '{"index_pattern": {"title": "test*", "timeFieldName": "timestamp"}}' \
+        -H 'kbn-xsrf: true' \
+        -H 'Content-Type: application/json' \
+        localhost:5601/api/index_patterns/index_pattern;
+
+
 # Run the event generator for 3 minutes
 docker run --rm falcosecurity/event-generator run syscall --loop & 
-sleep 20; 
+sleep 180; 
 kill $!;
-
-curl -X POST \
-	-d '{"index_pattern": {"title": "test*", "timeFieldName": "timestamp"}}' \
-	-H 'kbn-xsrf: true' \
-	-H 'Content-Type: application/json' \
-	localhost:5601/api/index_patterns/index_pattern;
