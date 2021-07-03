@@ -39,7 +39,7 @@ docker run \
 	--rm \
 	-d \
 	docker.elastic.co/kibana/kibana:7.12.1;
-echp "[!] Waiting for Kibana to start, sleeping 20s"
+echo "[!] Waiting for Kibana to start, sleeping 30s"
 sleep 30;
 
 falco -c ./falco_custom.yaml \
@@ -55,8 +55,16 @@ curl -X POST \
         -H 'Content-Type: application/json' \
         localhost:5601/api/index_patterns/index_pattern;
 
+#wget dashboard.json here
 
-# Run the event generator for 3 minutes
+curl -X POST \
+	-H 'kbn-xsrf: true' \
+	-H 'Content-Type: application/json' \
+	-d @dashboard_export.json \
+	localhost:5601/api/kibana/dashboards/import?exclude=index-pattern;
+
+
+# Run the event generator for 5 minutes
 docker run --rm falcosecurity/event-generator run syscall --loop & 
-sleep 180; 
+sleep 300; 
 kill $!;
