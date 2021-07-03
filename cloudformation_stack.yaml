@@ -8,11 +8,11 @@ Parameters:
   pWhitelistIP:
     Type: String
     Description: "Your IP Address (Ingress traffic will only be allowed from this IP)"
-    Default: "IP_ADDRESS"
+    Default: "<IP_ADDRESS>/32"
   pSSHKey:
     Type: String
     Description: "Name of key pair ID used to SSH into the instance"
-    Default: "KEYPAIR_NAME"
+    Default: "<KEYPAIR_NAME>"
 
 Resources:
   VPC:
@@ -111,7 +111,7 @@ Resources:
       UserData:
         Fn::Base64: |
           #!/bin/bash
-          echo "Hello World!"
+          curl https://raw.githubusercontent.com/anishsujanani/container-monitoring-platform-automation/master/ec2_setup.sh | bash
       Tags:
         - Key: Name
           Value: container-monitoring-ec2
