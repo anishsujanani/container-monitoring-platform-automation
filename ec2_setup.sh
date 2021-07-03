@@ -14,7 +14,7 @@ yum -y install falco;
 # pull config files and python scripts from github, store tham 
 mkdir /custom_falco_config;
 cd /custom_falco_config;
-wget https://github.com/anishsujanani/container-monitoring-platform-automation/blob/master/falco_custom.yaml;
+wget https://raw.githubusercontent.com/anishsujanani/container-monitoring-platform-automation/master/falco_custom.yaml;
 wget https://raw.githubusercontent.com/anishsujanani/container-monitoring-platform-automation/master/aggregate_alerts.py;
 
 pip3 install elasticsearch;
