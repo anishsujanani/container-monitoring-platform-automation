@@ -49,11 +49,11 @@ falco -c ./falco_custom.yaml \
 echo "[!] Waiting for Falco to start, sleeping 5s"
 sleep 5;
 
-curl -X POST \
-        -H 'kbn-xsrf: true' \
-        -H 'Content-Type: application/json' \
-	-d '{"index_pattern": {"title": "test*", "timeFieldName": "timestamp"}}' \
-        localhost:5601/api/index_patterns/index_pattern;
+#curl -X POST \
+#        -H 'kbn-xsrf: true' \
+#        -H 'Content-Type: application/json' \
+#	-d '{"index_pattern": {"title": "test*", "timeFieldName": "timestamp"}}' \
+#        localhost:5601/api/index_patterns/index_pattern;
 
 wget https://raw.githubusercontent.com/anishsujanani/container-monitoring-platform-automation/master/dashboard_export.json;
 
@@ -61,7 +61,7 @@ curl -X POST \
 	-H 'kbn-xsrf: true' \
 	-H 'Content-Type: application/json' \
 	-d @dashboard_export.json \
-	localhost:5601/api/kibana/dashboards/import?exclude=index-pattern;
+	localhost:5601/api/kibana/dashboards/import;
 
 
 # Run the event generator for 5 minutes
