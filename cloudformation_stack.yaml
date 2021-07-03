@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  pInstanceType:
+    Type: String
+    Description: "Instance type (t2.medium - 2 vCPUs, 4G Mem - recommended)"
+    Default: "t2.medium"
+  pWhitelistIP:
+    Type: String
+    Description: "Your IP Address (Ingress traffic will only be allowed from this IP)"
+    Default: "IP_ADDRESS"
+  pSSHKey:
+    Type: String
+    Description: "Name of key pair ID used to SSH into the instance"
+    Default: "KEYPAIR_NAME"
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: "Name"
+          Value: "container-monitoring-vpc"
+  
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: "container-monitoring-igw"
+  
+  IGWAttachmentToVPC:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref IGW
+  
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      VpcId: !Ref VPC
+      CidrBlock: "10.0.1.0/24"
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: container-monitoring-public-subnet
+  
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: container-monitoring-public-route-table
+  
+  IGWRoute:
+    Type: AWS::EC2::Route
+    DependsOn: IGW
+    Properties:
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref IGW
+      RouteTableId: !Ref RouteTable
+  
+  PublicSubnetAssocToRouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref RouteTable
+  
+  EC2SecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "container-monitoring-sg"
+      GroupDescription: "In: SSH (TCP/22), Kibana (TCP/5601). Out: ALL."
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref "pWhitelistIP"
+        - IpProtocol: "tcp"
+          FromPort: 5601
+          ToPort: 5601
+          CidrIp:  !Ref "pWhitelistIP"
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: "0.0.0.0/0"
+ 
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      ImageId: "ami-0ab4d1e9cf9a1215a"
+      InstanceType:
+        Ref: pInstanceType
+      KeyName: !Ref pSSHKey
+      SecurityGroupIds:
+        - Ref: EC2SecGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: "gp2"
+            SnapshotId: "snap-03e9050b362f59715"
+            VolumeSize: 8
+            DeleteOnTermination: "true"
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          echo "Hello World!"
+      Tags:
+        - Key: Name
+          Value: container-monitoring-ec2
+
+Outputs:
+  PublicIPAddress:
+    Description: "Public IP Address of instance."
+    Value:
+      Fn::GetAtt:
+        - EC2Instance
+        - PublicIp
+     

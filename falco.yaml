@@ -1,0 +1,81 @@
+rules_file:
+  - /etc/falco/falco_rules.yaml
+  - /etc/falco/falco_rules.local.yaml
+  - /etc/falco/k8s_audit_rules.yaml
+  - /etc/falco/rules.d
+
+time_format_iso_8601: false
+
+json_output: true
+
+json_include_output_property: true
+
+log_stderr: true
+log_syslog: true
+
+log_level: info
+
+priority: debug
+
+buffered_outputs: false
+
+syscall_event_drops:
+  threshold: .1
+  actions:
+    - log
+    - alert
+  rate: .03333
+  max_burst: 1
+
+output_timeout: 2000
+
+outputs:
+  rate: 1
+  max_burst: 1000
+
+syslog_output:
+  enabled: true
+
+file_output:
+  enabled: false
+  keep_alive: false
+  filename: ./events.txt
+
+stdout_output:
+  enabled: true
+
+webserver:
+  enabled: false
+  listen_port: 8765
+  k8s_audit_endpoint: /k8s-audit
+  k8s_healthz_endpoint: /healthz
+  ssl_enabled: false
+  ssl_certificate: /etc/falco/falco.pem
+
+program_output:
+  enabled: true
+  keep_alive: true
+  program: "python3 ./aggregate_alerts.py"
+  #program: "jq '{text: .output}' | curl -d @- -X POST https://hooks.slack.com/services/XXX"
+
+http_output:
+  enabled: false
+  url: http://some.url
+
+grpc:
+   enabled: false
+   bind_address: "0.0.0.0:5060"
+   threadiness: 0
+   private_key: "/tmp/grpc.key"
+   cert_chain: "/tmp/grpc.crt"
+   root_certs: "/tmp/ca.crt"
+
+# gRPC server using an unix socket
+grpc:
+  enabled: false
+  bind_address: "unix:///var/run/falco.sock"
+  # when threadiness is 0, Falco automatically guesses it depending on the number of online cores
+  threadiness: 0
+
+grpc_output:
+  enabled: false
