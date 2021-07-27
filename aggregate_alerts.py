@@ -1,3 +1,10 @@
+'''
+An extremely basic integration for Falco that takes alerts as
+stdin and pushes to a local ES cluster.
+This code is purely PoC, no judgement please.
+- Anish Sujanani
+'''
+
 import json
 import pprint
 import elasticsearch

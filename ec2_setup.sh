@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This is the script that EC2-user-data downloads and executes.
+# Responsible for setting up all components for the container monitoring platform.
+# - Anish Sujanani
+
 yum -y update && yum -y upgrade
 
 # install and run docker
@@ -53,6 +57,7 @@ falco -c ./falco_custom.yaml \
 echo "[!] Waiting for Falco to start, sleeping 5s"
 sleep 5;
 
+# manual creation of the index is no longer needed, this is done through the import-dashboard API
 #curl -X POST \
 #        -H 'kbn-xsrf: true' \
 #        -H 'Content-Type: application/json' \
