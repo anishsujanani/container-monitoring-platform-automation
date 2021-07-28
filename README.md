@@ -1,4 +1,4 @@
-# Container Security Platform Automation.
+# Container Security Platform Automation
 
 This repository contains the files needed to single-click deploy AWS infrastructure and set up Falco (a sys-call based container IDS) via Cloudformation templates and bash scripts.  
 
@@ -9,9 +9,9 @@ Take a look at [this blog post][0].
 
 ## A Brief Overview 
 **Cloudformation Inputs**
-- EC2-instace Type
-- IP Address to whitelist for Kibana
-- SSH key pair name
+- EC2-instace Type.
+- IP Address to whitelist for Kibana.
+- SSH key pair name.
 
 **Cloudformation Outputs**
 - VPC, (public) subnet, non-elastic IP assignment, IGW, route tables.
@@ -22,7 +22,7 @@ Take a look at [this blog post][0].
 - Installs all neccessary components.
 - Runs containerized instances of Elasticsearch, Kibana and Falco event-generator.
 - Runs Falco with a custom config and Python <-> ES integration.
-- Configures indices and dashboards via the Kibana API by importing the file `dashboard_export.json`  
+- Configures indices and dashboards via the Kibana API by importing the file `dashboard_export.json`.  
 
 
 
